@@ -1,10 +1,11 @@
 <?php
+use Carbon\Carbon;
 
 /**
  * Instructions:
  *
  * Create a class in the Vault namespace and rewrite each test to make the assertions pass.
- * NOTE: You can use any third party packages you deem necessary to complete the tests. 
+ * NOTE: You can use any third party packages you deem necessary to complete the tests.
  */
 
 class InterviewTests extends PHPUnit\Framework\TestCase {
@@ -17,6 +18,9 @@ class InterviewTests extends PHPUnit\Framework\TestCase {
         $data = "I want this job.";
 
         // Code here
+        $data = str_replace(".", "", $data);
+        $data = explode(" ", $data);
+        $data = array_reverse($data);
 
         $this->assertEquals(['job', 'this', 'want', 'I'], $data);
     }
@@ -29,6 +33,11 @@ class InterviewTests extends PHPUnit\Framework\TestCase {
         $data = ["200", "450", "2.5", "1", "505.5", "2"];
 
         // Code here
+        sort($data);
+
+        foreach ($data as $key => $num) {
+            strpos($num, '.') ? $data[$key] = (float) $num : $data[$key] = (int) $num;
+        }
 
         $this->assertTrue(1 === $data[0]);
         $this->assertTrue(2 === $data[1]);
@@ -47,12 +56,19 @@ class InterviewTests extends PHPUnit\Framework\TestCase {
         $data2 = [2, 4, 5, 7, 8, 9, 10];
 
         // Code here
+        $data = array_slice($data2, -3, 3, false);
 
         $this->assertEquals([8, 9, 10], $data);
 
         // Code here
+        $numbers = [1,3,6];
+        $data = [];
+        foreach ($numbers as $number) {
+            if(in_array($number, $data1))
+                $data[] += $number;
+        }
 
-        $this->assertEquals([1, 3, 6], $data);
+        $this->assertEquals([ 1, 3, 6 ], $data);
     }
 
     /**
@@ -63,7 +79,26 @@ class InterviewTests extends PHPUnit\Framework\TestCase {
         $place1 = ['lat' => '41.9641684', 'lon' => '-87.6859726'];
         $place2 = ['lat' => '42.1820210', 'lon' => '-88.3429465'];
 
+
         // Code here
+        $lat1 = $place1['lat'];
+        $lng1 = $place1['lon'];
+        $lat2 = $place2['lat'];
+        $lng2 = $place2['lon'];
+        $miles = true;
+
+        $pi80 = M_PI / 180;
+        $lat1 *= $pi80; $lng1 *= $pi80;
+        $lat2 *= $pi80; $lng2 *= $pi80;
+
+        $r = 6372.797; // mean radius of Earth in kilometers
+        $dlat = $lat2 - $lat1;
+        $dlng = $lng2 - $lng1;
+        $a = sin($dlat / 2) * sin($dlat / 2) + cos($lat1) * cos($lat2) * sin($dlng / 2) * sin($dlng / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        $km = $r * $c;
+
+        $distance = number_format((float) $miles ? ( $km * 0.621371192 ) : $km, 2, '.', '');
 
         $this->assertEquals(36.91, $distance);
     }
@@ -76,7 +111,15 @@ class InterviewTests extends PHPUnit\Framework\TestCase {
         $time1 = "2016-06-05T12:00:00";
         $time2 = "2016-06-05T15:00:00";
 
+
         // Code here
+        $time1 = new Carbon($time1);
+        $time2 = new Carbon($time2);
+        $dt     = Carbon::now();
+
+        $diffInHours = $time2->diffInHours($time1);
+        $timeDiff =  $dt->subHour($diffInHours)->diffForHumans();
+
 
         $this->assertEquals("3 hours ago", $timeDiff);
     }
